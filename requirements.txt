@@ -1,2 +1,4 @@
 Flask==3.0.3
 pandas==2.2.2
+langextract>=1.0.5
+google-genai>=1.32.0

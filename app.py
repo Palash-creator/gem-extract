@@ -7,7 +7,7 @@ from typing import Dict, List
 import pandas as pd
 from flask import Flask, jsonify, render_template, request, send_file
 
-from extractor import LangExtractAdapter
+from extractor import ExtractionPipelineError, LangExtractAdapter
 
 app = Flask(__name__)
 extractor = LangExtractAdapter()
@@ -21,7 +21,16 @@ def index():
 @app.route("/api/extract", methods=["POST"])
 def extract():
     raw_fields = request.form.get("fields", "[]")
-    fields: List[str] = [f.strip() for f in json.loads(raw_fields) if f.strip()]
+    try:
+        parsed_fields = json.loads(raw_fields)
+    except json.JSONDecodeError:
+        return jsonify({"error": "Invalid fields format. Send a JSON array."}), 400
+
+    fields: List[str] = []
+    for field in parsed_fields if isinstance(parsed_fields, list) else []:
+        cleaned = str(field).strip()
+        if cleaned and cleaned not in fields:
+            fields.append(cleaned)
 
     uploaded_files = request.files.getlist("documents")
     documents: List[Dict[str, str]] = []
@@ -31,16 +40,23 @@ def extract():
         documents.append({"name": file.filename or "unnamed.txt", "text": text})
 
     if not fields:
-        return jsonify({"error": "Please provide at least one field."}), 400
+        return jsonify({"error": "Please provide at least one valid field."}), 400
     if not documents:
         return jsonify({"error": "Please upload at least one document."}), 400
 
-    result = extractor.extract(documents=documents, fields=fields)
+    try:
+        result = extractor.extract(documents=documents, fields=fields)
+    except ExtractionPipelineError as err:
+        return jsonify({"error": str(err)}), 400
+    except Exception as err:  # noqa: BLE001
+        return jsonify({"error": f"Unexpected extraction failure: {err}"}), 500
+
     return jsonify(
         {
             "fields": ["document", *fields],
             "records": result.records,
             "logs": result.logs,
+            "engine": result.engine,
             "status": "completed",
         }
     )
@@ -48,7 +64,10 @@ def extract():
 
 @app.route("/api/export/csv", methods=["POST"])
 def export_csv():
-    payload = request.get_json(force=True)
+    payload = request.get_json(silent=True)
+    if not payload:
+        return jsonify({"error": "Missing JSON body."}), 400
+
     records = payload.get("records", [])
     if not records:
         return jsonify({"error": "No records to export."}), 400

@@ -111,7 +111,7 @@ document.getElementById('run-btn').addEventListener('click', async () => {
     }
 
     stopProgressAnimation(true);
-    appendLog('Extraction completed successfully.');
+    appendLog(`Extraction completed successfully using: ${payload.engine}.`);
     payload.logs.forEach((entry) => appendLog(entry));
 
     state.result = payload;
