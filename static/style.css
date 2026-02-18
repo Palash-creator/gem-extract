@@ -163,3 +163,14 @@ th, td {
 
 th { background: #0a2f5f; }
 tr:nth-child(even) { background: rgba(17, 52, 97, 0.35); }
+
+
+.muted-note {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.muted-note code {
+  color: #b8d4ff;
+}

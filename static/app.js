@@ -98,9 +98,13 @@ document.getElementById('run-btn').addEventListener('click', async () => {
   appendLog('Preparing extraction request...');
   startProgressAnimation();
 
+  const apiKeyInput = document.getElementById('api-key');
   const formData = new FormData();
   [...docsInput.files].forEach((file) => formData.append('documents', file));
   formData.append('fields', JSON.stringify(state.fields));
+  if (apiKeyInput.value.trim()) {
+    formData.append('apiKey', apiKeyInput.value.trim());
+  }
 
   try {
     const res = await fetch('/api/extract', { method: 'POST', body: formData });
@@ -158,6 +162,7 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   jsonOutput.textContent = '{}';
   tableWrap.innerHTML = '';
   document.getElementById('documents').value = '';
+  document.getElementById('api-key').value = '';
   document.getElementById('download-csv').disabled = true;
   setProgress(0, 'Idle');
 });

@@ -14,6 +14,13 @@
         <p>Upload documents, define fields, extract entities, review JSON, and export CSV.</p>
       </header>
 
+
+      <section class="panel">
+        <h2>0) Gemini API Key (Optional)</h2>
+        <input id="api-key" type="password" placeholder="Paste Gemini API key here (optional per run)" />
+        <p class="muted-note">Tip: Leave empty to use environment variables (<code>GEMINI_API_KEY</code> or <code>LANGEXTRACT_API_KEY</code>).</p>
+      </section>
+
       <section class="panel">
         <h2>1) Upload Documents</h2>
         <input id="documents" type="file" multiple accept=".txt,.md,.csv,.json" />

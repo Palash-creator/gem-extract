@@ -20,7 +20,12 @@ class ExtractionPipelineError(RuntimeError):
 
 
 class BaseExtractor:
-    def extract(self, documents: List[Dict[str, str]], fields: List[str]) -> ExtractionResult:
+    def extract(
+        self,
+        documents: List[Dict[str, str]],
+        fields: List[str],
+        api_key_override: str | None = None,
+    ) -> ExtractionResult:
         raise NotImplementedError
 
 
@@ -37,7 +42,12 @@ class LangExtractAdapter(BaseExtractor):
         except Exception:
             self._langextract = None
 
-    def extract(self, documents: List[Dict[str, str]], fields: List[str]) -> ExtractionResult:
+    def extract(
+        self,
+        documents: List[Dict[str, str]],
+        fields: List[str],
+        api_key_override: str | None = None,
+    ) -> ExtractionResult:
         if not documents:
             raise ExtractionPipelineError("No documents were provided for extraction.")
         if not fields:
@@ -52,7 +62,7 @@ class LangExtractAdapter(BaseExtractor):
             )
             return result
 
-        api_key = os.getenv("LANGEXTRACT_API_KEY") or os.getenv("GEMINI_API_KEY")
+        api_key = (api_key_override or "").strip() or os.getenv("LANGEXTRACT_API_KEY") or os.getenv("GEMINI_API_KEY")
         if not api_key:
             fallback = RegexFallbackExtractor()
             result = fallback.extract(documents, fields)
@@ -157,7 +167,12 @@ class RegexFallbackExtractor(BaseExtractor):
 
     ENTITY_PATTERN = re.compile(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b")
 
-    def extract(self, documents: List[Dict[str, str]], fields: List[str]) -> ExtractionResult:
+    def extract(
+        self,
+        documents: List[Dict[str, str]],
+        fields: List[str],
+        api_key_override: str | None = None,
+    ) -> ExtractionResult:
         logs = ["Running fallback extraction engine."]
         records: List[Dict[str, str]] = []
 

@@ -32,6 +32,8 @@ def extract():
         if cleaned and cleaned not in fields:
             fields.append(cleaned)
 
+    api_key_override = request.form.get("apiKey", "").strip()
+
     uploaded_files = request.files.getlist("documents")
     documents: List[Dict[str, str]] = []
 
@@ -45,7 +47,7 @@ def extract():
         return jsonify({"error": "Please upload at least one document."}), 400
 
     try:
-        result = extractor.extract(documents=documents, fields=fields)
+        result = extractor.extract(documents=documents, fields=fields, api_key_override=api_key_override)
     except ExtractionPipelineError as err:
         return jsonify({"error": str(err)}), 400
     except Exception as err:  # noqa: BLE001
