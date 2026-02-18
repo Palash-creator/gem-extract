@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LangExtract Entity Studio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <div class="bg-overlay"></div>
+    <main class="container">
+      <header class="app-header">
+        <h1>LangExtract Entity Studio</h1>
+        <p>Upload documents, define fields, extract entities, review JSON, and export CSV.</p>
+      </header>
+
+
+      <section class="panel">
+        <h2>0) Gemini API Key (Optional)</h2>
+        <input id="api-key" type="password" placeholder="Paste Gemini API key here (optional per run)" />
+        <p class="muted-note">Tip: Leave empty to use environment variables (<code>GEMINI_API_KEY</code> or <code>LANGEXTRACT_API_KEY</code>).</p>
+      </section>
+
+      <section class="panel">
+        <h2>1) Upload Documents</h2>
+        <input id="documents" type="file" multiple accept=".txt,.md,.csv,.json" />
+      </section>
+
+      <section class="panel">
+        <h2>2) Extraction Fields</h2>
+        <div class="field-controls">
+          <input id="field-input" type="text" placeholder="e.g., Person, Organization, Location" />
+          <button id="add-field">Add Field</button>
+        </div>
+        <ul id="field-list"></ul>
+      </section>
+
+      <section class="panel controls-panel">
+        <h2>3) Run Extraction</h2>
+        <div class="button-row">
+          <button id="run-btn" class="primary">Run Extraction</button>
+          <button id="download-csv" disabled>Download CSV</button>
+          <button id="clear-btn">Clear</button>
+        </div>
+        <div class="status-wrap">
+          <div class="status-meta">
+            <span>Status: <strong id="status-text">Idle</strong></span>
+            <span id="progress-label">0%</span>
+          </div>
+          <div class="progress-track">
+            <div id="progress-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel two-col">
+        <div>
+          <h2>Live Logs</h2>
+          <pre id="logs">System ready.</pre>
+        </div>
+        <div>
+          <h2>JSON Output</h2>
+          <pre id="json-output">{}</pre>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Extracted Table</h2>
+        <div id="table-wrap" class="table-wrap"></div>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
